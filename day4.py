@@ -98,15 +98,6 @@ test_bingo_card()
 with open("day4-input.txt") as f:
     values = f.read().splitlines()
 
-def hit_all_cards(cards: List[BingoCard], number:int ) -> BingoCard:
-    for c in cards:
-        c.hit(number)
-
-        if c.won():
-            return c
-    
-    return None
-
 # part 1
 seq = [int(v) for v in values[0].split(",")]
 values = values[2:]
@@ -115,7 +106,6 @@ cards = []
 while len(values) > 0:
     board = " ".join(values[:5])
     card = BingoCard(board)
-    #print("created card " + card.id)
     cards.append(card)
     values = values[6:]
 
