@@ -1,3 +1,5 @@
+from collections import deque
+
 with open("day6-input.txt") as f:
     values = f.read().split(",")
     values = [int(v) for v in values]
@@ -6,6 +8,7 @@ with open("day6-input.txt") as f:
 num_iterations = 80
 fish = values.copy()
 
+# naive implementation
 for _ in range(num_iterations):
     new_fish = 0
 
@@ -20,3 +23,17 @@ for _ in range(num_iterations):
     new_fish = 0
 
 print(len(fish))
+
+# part 2
+num_iterations = 256
+fish = deque([values.count(n) for n in range(9)])
+
+# much better implementation
+for _ in range(num_iterations):
+    # num of fish who were change to 0 in last iteration
+    new_fish = fish.popleft()
+
+    fish[6] += new_fish
+    fish.append(new_fish)
+
+print(sum(fish))
