@@ -19,8 +19,6 @@ PATTERN_MAPPINGS_5S6S = {
     "abcdfg": "9",
 }
 
-LEGAL_PATTERNS_5S6S = list(PATTERN_MAPPINGS_5S6S.keys())
-
 def str_diff(s1: str, s2: str) -> str:
     diff = ""
 
@@ -48,8 +46,7 @@ def apply_mapping(pattern: str, mapping: Dict) -> List[str]:
     results = []
 
     for char in pattern:
-        if len(mapping[char]) == 0:
-            raise Exception("something weird happened")
+        assert(len(mapping[char]) > 0)
 
         if not results:
             results = list(mapping[char])
@@ -113,7 +110,7 @@ for pattern, result in values:
         #     break
 
         applied = apply_mapping(pattern_5s6s, mapping)
-        applied = [p for p in applied if sort_p(p) in LEGAL_PATTERNS_5S6S]
+        applied = [p for p in applied if sort_p(p) in PATTERN_MAPPINGS_5S6S.keys()]
 
         # this may fail, let's see
         assert(len(applied) <= 2)
