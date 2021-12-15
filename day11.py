@@ -4,12 +4,14 @@ with open("day11-input.txt") as f:
     values = f.read().splitlines()
     values = [[int(v) for v in line] for line in values]
 
-# part 1
+# part 1 + 2
 dim_x = len(values[0])
 dim_y = len(values)
 iterations = 100
 octopi = values.copy()
 total_flashes = 0
+all_flashed = False
+i = 0
 
 adjacencies = [(1, 1), (1, 0), (0, 1), (1, -1), (-1, 1), (0, -1), (-1, 0), (-1, -1)]
 
@@ -18,7 +20,8 @@ def get_adj_coords(x: int, y: int) -> List[Tuple]:
         if x + x_adj >= 0 and x + x_adj < dim_x and y + y_adj >= 0 and y + y_adj < dim_y]
 
 
-for i in range(iterations):
+while not all_flashed:
+    i += 1
     # increase all levels
     for y in range(dim_y):
         for x in range(dim_x):
@@ -50,6 +53,11 @@ for i in range(iterations):
         octopi[y_f][x_f] = 0
 
     total_flashes += flashes
+    all_flashed = flashes == dim_x * dim_y
 
-print(total_flashes)
-    
+    # part 1
+    if i == iterations:
+        print(i, total_flashes)
+
+# part 2
+print(i, total_flashes)
