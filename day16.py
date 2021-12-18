@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import List, Tuple
+from math import prod
 
 with open("day16-input.txt") as f:
     value = f.read()
@@ -64,18 +65,27 @@ class Packet:
     def __str__(self) -> str:
         return str(vars(self))
 
+PACKET_TYPES = {
+    0: "sum",
+    1: "pro",
+    2: "min",
+    3: "max",
+    4: "lit",
+    5: "gth",
+    6: "lth",
+    7: "equ"
+}
+
 def parse_header(raw: BitString) -> Tuple[Packet, int]:
     version = raw.sub(0, 3).as_int()
     type = raw.sub(3, 3).as_int()
+    p = Packet(PACKET_TYPES[type], version)
+    header_len = 6
 
-    if type == 4: # literal packet
-        p = Packet("lit", version)
-        header_len = 6
-    else: # operator packet
-        p = Packet("opr", version)
+    if type != 4: # operator packet
         p.len_type = "numsub" if raw.sub(6, 1).as_int() else "bitlen"
         p.length = raw.sub(7, 15 if p.len_type == "bitlen" else 11).as_int()
-        header_len = 22 if p.len_type == "bitlen" else 18
+        header_len += 16 if p.len_type == "bitlen" else 12
     
     return (p, header_len)
 
@@ -124,6 +134,7 @@ def parse_packets(raw: BitString, count: int = -1) -> Tuple[List[Packet], int]:
     return (ps, total_consumed)
 
 p, _ = parse_packets(BitString("0x" + value))
+print(p[0])
 
 def cum_versions(packets: List[Packet]) -> int:
     v = 0
@@ -133,3 +144,25 @@ def cum_versions(packets: List[Packet]) -> int:
     return v
 
 print(cum_versions(p))
+
+# part 2
+
+def evaluate(p: Packet) -> int:
+    if p.type == "lit":
+        return p.value
+    elif p.type == "sum":
+        return sum([evaluate(sp) for sp in p.sub_packets])
+    elif p.type == "pro":
+        return prod([evaluate(sp) for sp in p.sub_packets])
+    elif p.type == "min":
+        return min([evaluate(sp) for sp in p.sub_packets])
+    elif p.type == "max":
+        return max([evaluate(sp) for sp in p.sub_packets])
+    elif p.type == "gth":
+        return 1 if evaluate(p.sub_packets[0]) > evaluate(p.sub_packets[1]) else 0
+    elif p.type == "lth":
+        return 1 if evaluate(p.sub_packets[0]) < evaluate(p.sub_packets[1]) else 0
+    elif p.type == "equ":
+        return 1 if evaluate(p.sub_packets[0]) == evaluate(p.sub_packets[1]) else 0
+
+print(evaluate(p[0]))
